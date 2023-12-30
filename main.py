@@ -1,3 +1,6 @@
+from collections import deque
+
+
 class State:
     def __init__(self, state: list, depth: int = 0, parent=None) -> None:
         self.state = state
@@ -6,7 +9,7 @@ class State:
         self.index = state.index(0)
 
     def __repr__(self) -> str:
-        return f"{self.state[:3]}\n{self.state[3:6]}\n{self.state[6:]}"
+        return f"{self.state[:3]}\n{self.state[3:6]}\n{self.state[6:]}\n"
 
     def get_available_moves(self) -> list:
         match self.index:
@@ -72,13 +75,39 @@ class State:
         return children
 
 
-INITIAL = [1, 2, 3, 4, 0, 5, 6, 7, 8]
-GOAL = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+def main():
+    INITIAL = [1, 2, 3, 4, 0, 5, 6, 7, 8]
+    GOAL = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
-n1 = State(INITIAL)
-print(n1)
-print(n1.get_available_moves())
-children = n1.gen_children()
-for child in children:
-    print(child)
-    print("\n")
+    # Perform BFS
+    n1 = State(INITIAL)
+    dq = deque([n1])
+    visited = set()
+    while dq:
+        for elem in dq:
+            # Check if goal state has been reached
+            if elem.state == GOAL:
+                for vist in visited:
+                    print(vist)
+                print("Goal reached:")
+                print(elem)
+                exit(0)
+
+        # Expand the left most node to get its children
+        # Add that node to the list of visited nodes
+        # Pop the node of which children has been obtained
+        children = dq[0].gen_children()
+        visited.add(tuple(dq[0].state))
+        dq.extend(children)
+        dq.popleft()
+
+        # Make a copy of deque such that modification can be made while iterating
+        # Remove visited nodes if any reappear in the deque
+        copy_dq = dq.copy()
+        for elem in copy_dq:
+            if tuple(elem.state) in visited:
+                dq.remove(elem)
+
+
+if __name__ == "__main__":
+    main()
