@@ -1,4 +1,5 @@
 from collections import deque
+from collections_extended import setlist
 
 
 class State:
@@ -76,19 +77,17 @@ class State:
 
 
 def main():
-    INITIAL = [1, 2, 3, 4, 0, 5, 6, 7, 8]
-    GOAL = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    INITIAL = [1, 2, 3, 0, 4, 6, 7, 5, 8]
+    GOAL = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
     # Perform BFS
     n1 = State(INITIAL)
     dq = deque([n1])
-    visited = set()
+    visited = setlist()
     while dq:
         for elem in dq:
             # Check if goal state has been reached
             if elem.state == GOAL:
-                for vist in visited:
-                    print(vist)
                 print("Goal reached:")
                 print(elem)
                 exit(0)
@@ -97,7 +96,8 @@ def main():
         # Add that node to the list of visited nodes
         # Pop the node of which children has been obtained
         children = dq[0].gen_children()
-        visited.add(tuple(dq[0].state))
+        visited.add(dq[0])
+        print(dq[0])
         dq.extend(children)
         dq.popleft()
 
@@ -105,8 +105,9 @@ def main():
         # Remove visited nodes if any reappear in the deque
         copy_dq = dq.copy()
         for elem in copy_dq:
-            if tuple(elem.state) in visited:
-                dq.remove(elem)
+            for i in visited:
+                if elem.state == i.state:
+                    dq.remove(elem)
 
 
 if __name__ == "__main__":
