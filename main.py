@@ -82,7 +82,7 @@ class State:
 def visualization(visited: setlist) -> None:
     dot = graphviz.Graph(format="png")
     for i in visited:
-        dot.node(name=i.id, label=str(i.state))
+        dot.node(name=i.id, label=f"{i.state[:3]}\n{i.state[3:6]}\n{i.state[6:]}")
         if i.parent is not None:
             dot.edge(i.parent, i.id)
     dot.render("graph")
