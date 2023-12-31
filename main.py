@@ -1,9 +1,12 @@
+import shortuuid
+import graphviz
 from collections import deque
 from collections_extended import setlist
 
 
 class State:
     def __init__(self, state: list, depth: int = 0, parent=None) -> None:
+        self.id = shortuuid.ShortUUID().random(length=6)
         self.state = state
         self.parent = parent
         self.depth = depth
@@ -45,7 +48,7 @@ class State:
                         new_state[zi - 3],
                         new_state[zi],
                     )
-                    s1 = State(state=new_state, parent=self.state, depth=self.depth + 1)
+                    s1 = State(state=new_state, parent=self.id, depth=self.depth + 1)
                     children.append(s1)
                 case "down":
                     new_state = self.state[:]
@@ -53,7 +56,7 @@ class State:
                         new_state[zi + 3],
                         new_state[zi],
                     )
-                    s2 = State(state=new_state, parent=self.state, depth=self.depth + 1)
+                    s2 = State(state=new_state, parent=self.id, depth=self.depth + 1)
                     children.append(s2)
 
                 case "left":
@@ -62,7 +65,7 @@ class State:
                         new_state[zi - 1],
                         new_state[zi],
                     )
-                    s3 = State(state=new_state, parent=self.state, depth=self.depth + 1)
+                    s3 = State(state=new_state, parent=self.id, depth=self.depth + 1)
                     children.append(s3)
 
                 case "right":
@@ -71,13 +74,22 @@ class State:
                         new_state[zi + 1],
                         new_state[zi],
                     )
-                    s4 = State(state=new_state, parent=self.state, depth=self.depth + 1)
+                    s4 = State(state=new_state, parent=self.id, depth=self.depth + 1)
                     children.append(s4)
         return children
 
 
-def main():
-    INITIAL = [1, 2, 3, 0, 4, 6, 7, 5, 8]
+def visualization(visited: setlist) -> None:
+    dot = graphviz.Graph(format="png")
+    for i in visited:
+        dot.node(name=i.id, label=str(i.state))
+        if i.parent is not None:
+            dot.edge(i.parent, i.id)
+    dot.render("graph")
+
+
+def traverse() -> setlist:
+    INITIAL = [0, 1, 3, 4, 2, 6, 7, 5, 8]
     GOAL = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
     # Perform BFS
@@ -89,8 +101,9 @@ def main():
             # Check if goal state has been reached
             if elem.state == GOAL:
                 print("Goal reached:")
+                visited.add(elem)
                 print(elem)
-                exit(0)
+                return visited
 
         # Expand the left most node to get its children
         # Add that node to the list of visited nodes
@@ -111,4 +124,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    visited = traverse()
+    visualization(visited)
